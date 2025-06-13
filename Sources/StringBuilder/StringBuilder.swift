@@ -17,29 +17,29 @@ extension String: StringBuildable { public var stringValue: String { self } }
 public enum StringBuilder {
 
     // 2.1  transform every sub-expression
-    public static func buildExpression(_ expression: some StringBuildable) -> String {
+    public static func buildExpression(_ expression: StringBuildable) -> String {
         expression.stringValue
     }
 
     // 2.2  concatenate a series of items
-    public static func buildBlock(_ components: String...) -> String {
-        components.joined()
+    public static func buildBlock(_ components: StringBuildable...) -> String {
+        components.map(\.stringValue).joined()
     }
 
     // 2.3  handle `if/else`
-    public static func buildEither(first component: String)  -> String { component }
-    public static func buildEither(second component: String) -> String { component }
+    public static func buildEither(first component: StringBuildable)  -> String { component.stringValue }
+    public static func buildEither(second component: StringBuildable) -> String { component.stringValue }
 
     // 2.4  handle `if` with no `else`
-    public static func buildOptional(_ component: String?) -> String { component ?? "" }
+    public static func buildOptional(_ component: StringBuildable?) -> String { component?.stringValue ?? "" }
 
     // 2.5  handle `for-loop` results
-    public static func buildArray(_ components: [String]) -> String {
-        components.joined()
+    public static func buildArray(_ components: [StringBuildable]) -> String {
+        components.map(\.stringValue).joined()
     }
 
     // 2.6  handle `#availability` blocks
-    public static func buildLimitedAvailability(_ component: String) -> String { component }
+    public static func buildLimitedAvailability(_ component: StringBuildable) -> String { component.stringValue }
 }
 
 // MARK: - 3. Example usage
