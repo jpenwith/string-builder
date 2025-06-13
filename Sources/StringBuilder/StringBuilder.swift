@@ -19,9 +19,17 @@ extension String: StringBuildable {
 @resultBuilder
 public enum StringBuilder {
 
-    // 2.1  transform every sub-expression
+    // 2.1a transform plain String literals directly
+    public static func buildExpression(_ expression: String) -> String {
+        expression
+    }
+
+    // 2.1  transform every other StringBuildable
     public static func buildExpression(_ expression: StringBuildable) -> String {
-        expression.stringValue
+        if let str = expression as? String {
+            return str
+        }
+        return expression.stringValue
     }
 
     // 2.2  concatenate a series of items
