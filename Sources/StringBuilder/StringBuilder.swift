@@ -6,10 +6,13 @@ import Foundation   // only for StringProtocol conveniences
 
 /// Anything that can be reduced to a plain `String`
 public protocol StringBuildable {
+    @StringBuilder
     var stringValue: String { get }
 }
 
-extension String: StringBuildable { public var stringValue: String { self } }
+extension String: StringBuildable {
+    public var stringValue: String { self }
+}
 
 // MARK: - 2. Result-builder
 
@@ -41,28 +44,3 @@ public enum StringBuilder {
     // 2.6  handle `#availability` blocks
     public static func buildLimitedAvailability(_ component: StringBuildable) -> String { component.stringValue }
 }
-
-// MARK: - 3. Example usage
-
-struct Hello: StringBuildable {
-    let nationality: String
-    let name: String
-
-    @StringBuilder
-    var stringValue: String {
-        if nationality == "american" {
-            "Howdy"
-        } else {
-            "Hello"
-        }
-
-        " "    // ← a literal space
-
-        name   // the actual name
-    }
-}
-
-// MARK: - 4. Result
-
-let msg = Hello(nationality: "american", name: "Liz").stringValue
-print(msg)            // → "Howdy Liz"
