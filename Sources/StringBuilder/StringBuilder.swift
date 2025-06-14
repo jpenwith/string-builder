@@ -2,53 +2,37 @@
 // https://docs.swift.org/swift-book
 import Foundation   // only for StringProtocol conveniences
 
-// MARK: - 1. Core protocol
-
-/// Anything that can be reduced to a plain `String`
-public protocol StringBuildable {
-    @StringBuilder
-    var stringValue: String { get }
-}
-
-extension String: StringBuildable {
-    public var stringValue: String { self }
-}
-
-// MARK: - 2. Result-builder
 
 @resultBuilder
 public enum StringBuilder {
+    /// Collect every partial result and glue them together.
+    public static func buildBlock(_ components: String...) -> String { components.joined() }
 
-    // 2.1a transform plain String literals directly
-    public static func buildExpression(_ expression: String) -> String {
-        expression
-    }
+    /// Allow plain `String` expressions.
+    public static func buildExpression(_ expression: String) -> String { expression }
 
-    // 2.1  transform every other StringBuildable
-    public static func buildExpression(_ expression: StringBuildable) -> String {
-        if let str = expression as? String {
-            return str
-        }
-        return expression.stringValue
-    }
+    /// Gracefully ignore `nil` strings.
+    public static func buildExpression(_ expression: String?) -> String { expression ?? "" }
 
-    // 2.2  concatenate a series of items
-    public static func buildBlock(_ components: StringBuildable...) -> String {
-        components.map(\.stringValue).joined()
-    }
+    /// Support `if/else`.
+    public static func buildEither(first component: String) -> String  { component }
+    public static func buildEither(second component: String) -> String { component }
 
-    // 2.3  handle `if/else`
-    public static func buildEither(first component: StringBuildable)  -> String { component.stringValue }
-    public static func buildEither(second component: StringBuildable) -> String { component.stringValue }
+    /// Support `if let` / `switch`.
+    public static func buildOptional(_ component: String?) -> String   { component ?? "" }
 
-    // 2.4  handle `if` with no `else`
-    public static func buildOptional(_ component: StringBuildable?) -> String { component?.stringValue ?? "" }
+    /// Support `for` loops.
+    public static func buildArray(_ components: [String]) -> String    { components.joined() }
 
-    // 2.5  handle `for-loop` results
-    public static func buildArray(_ components: [StringBuildable]) -> String {
-        components.map(\.stringValue).joined()
-    }
+    /// Support  if #available` loops.
+    public static func buildLimitedAvailability(_ component: String) -> String { component }
 
-    // 2.6  handle `#availability` blocks
-    public static func buildLimitedAvailability(_ component: StringBuildable) -> String { component.stringValue }
+    /// (Optional) hook that runs last.
+    public static func buildFinalResult(_ component: String) -> String { component }
+}
+
+
+public protocol StringBuildable {
+    /// Conforming types implement this just like `body` in `View`.
+    @StringBuilder var stringValue: String { get }
 }
