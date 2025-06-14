@@ -31,6 +31,9 @@ public enum StringBuilder {
     public static func buildFinalResult(_ component: String) -> String { component }
 }
 
+public func buildString(@StringBuilder builder: () -> String) -> String {
+    builder()
+}
 
 public protocol StringBuildable {
     /// Conforming types implement this just like `body` in `View`.

@@ -102,3 +102,14 @@ private func build(@StringBuilder _ content: () -> String) -> String {
     #expect(greeting3.stringValue == "G'day Mr. Bogan")
     #expect(greeting4.stringValue == "Bonjour Mrs. Gisette")
 }
+
+@Test func testBuildString() {
+    let result = buildString {
+        "How"
+        "are"
+        "you"
+        "?"
+    }
+    
+    #expect(result == "Howareyou?")
+}
