@@ -47,7 +47,7 @@ private func build(@StringBuilder _ content: () -> String) -> String {
     } == "Hello World")
 }
 
-@Test func testStringBuildable() async throws {
+@Test func testBasicStringBuildable() async throws {
     struct Greeting: StringBuildable {
         let name: String
         let sex: Sex
@@ -101,6 +101,41 @@ private func build(@StringBuilder _ content: () -> String) -> String {
     #expect(greeting2.stringValue == "Alright Mrs. Sally")
     #expect(greeting3.stringValue == "G'day Mr. Bogan")
     #expect(greeting4.stringValue == "Bonjour Mrs. Gisette")
+}
+
+@Test func testCompoundStringBuildable() async throws {
+    struct Greeting: StringBuildable {
+        let name: String
+        let weather: Weather
+
+        struct Weather: StringBuildable {
+            let description: String
+            
+            var stringValue: String {
+                "looks like it's "
+                description
+                " today!"
+            }
+        }
+
+        var stringValue: String {
+            "Hello"
+            
+            " "
+            
+            name
+            
+            ", "
+            
+            weather
+        }
+    }
+    
+    let greeting1 = Greeting(name: "John", weather: .init(description: "sunny"))
+    let greeting2 = Greeting(name: "Sally", weather: .init(description: "wet"))
+    
+    #expect(greeting1.stringValue == "Hello John, looks like it's sunny today!")
+    #expect(greeting2.stringValue == "Hello Sally, looks like it's wet today!")
 }
 
 @Test func testBuildString() {

@@ -29,6 +29,32 @@ public enum StringBuilder {
 
     /// (Optional) hook that runs last.
     public static func buildFinalResult(_ component: String) -> String { component }
+    
+    /// Collect every partial result and glue them together.
+    public static func buildBlock<T: StringBuildable>(_ components: T...) -> String { components.map(\.stringValue).joined() }
+
+    /// Allow plain `String` expressions.
+    public static func buildExpression<T: StringBuildable>(_ expression: T) -> String { expression.stringValue }
+
+    /// Optional value
+    public static func buildExpression<T: StringBuildable>(_ expression: T?) -> String { expression?.stringValue ?? "" }
+
+    /// Support `if/else`.
+    public static func buildEither<T: StringBuildable>(first component: T) -> String  { component.stringValue }
+    public static func buildEither<T: StringBuildable>(second component: T) -> String { component.stringValue }
+
+    /// Support `if let` / `switch`.
+    public static func buildOptional<T: StringBuildable>(_ component: T?) -> String   { component?.stringValue ?? "" }
+
+    /// Support `for` loops.
+    public static func buildArray<T: StringBuildable>(_ components: [T]) -> String { components.map(\.stringValue).joined() }
+
+    /// Support  if #available` loops.
+    public static func buildLimitedAvailability<T: StringBuildable>(_ component: T) -> String { component.stringValue }
+
+    /// (Optional) hook that runs last.
+    public static func buildFinalResult<T: StringBuildable>(_ component: T) -> String { component.stringValue }
+
 }
 
 public func buildString(@StringBuilder builder: () -> String) -> String {
