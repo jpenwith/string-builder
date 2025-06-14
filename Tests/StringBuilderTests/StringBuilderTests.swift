@@ -148,3 +148,30 @@ private func build(@StringBuilder _ content: () -> String) -> String {
     
     #expect(result == "Howareyou?")
 }
+
+@Test func testExpressionWithStringBuildable() async throws {
+    struct X: StringBuildable { let v: String; @StringBuilder var stringValue: String { v + "!" } }
+    let x = X(v: "Hi")
+    #expect(StringBuilder.buildExpression(x) == "Hi!")
+}
+
+@Test func testOptionalStringBuildableExpression() async throws {
+    struct Y: StringBuildable { let v: String; @StringBuilder var stringValue: String { v + "?" } }
+    let y: Y? = nil
+    #expect(StringBuilder.buildExpression(y) == "")
+    let y2: Y? = Y(v: "Yo")
+    #expect(StringBuilder.buildExpression(y2) == "Yo?")
+}
+
+@Test func testArrayOfStringBuildable() async throws {
+    struct Z: StringBuildable { let v: String; @StringBuilder var stringValue: String { v } }
+    let arr: [Z] = [Z(v: "A"), Z(v: "B"), Z(v: "C")]
+    #expect(StringBuilder.buildArray(arr) == "ABC")
+}
+
+@Test func testNestedStringBuildableInBuilder() {
+    struct Inner: StringBuildable { let i: Int; @StringBuilder var stringValue: String { "inner:\(i)" } }
+    struct Outer: StringBuildable { let o: String; let inner: Inner; @StringBuilder var stringValue: String { o; ": "; inner } }
+    let result = buildString { Outer(o: "out", inner: Inner(i: 7)) }
+    #expect(result == "out: inner:7")
+}
